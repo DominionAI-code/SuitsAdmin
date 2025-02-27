@@ -1,18 +1,66 @@
-import api from "../Services/api"; // Import main API instance
+import axios from "axios";
 
-// Categories
-export const fetchCategories = async () => api.get("/inventory/categories/");
-export const createCategory = async (categoryData) => api.post("/inventory/categories/", categoryData);
+const API_URL = "http://127.0.0.1:8000/api/inventory";
 
-// Products
-export const fetchProducts = async () => api.get("/inventory/products/");
-export const createProduct = async (productData) => api.post("/inventory/products/", productData);
-export const getProductDetails = async (productId) => api.get(`/inventory/products/${productId}/`);
-export const updateProduct = async (productId, updateData) => api.put(`/inventory/products/${productId}/`, updateData);
-export const deleteProduct = async (productId) => api.delete(`/inventory/products/${productId}/`);
+// Function to get JWT token from localStorage
+const getToken = () => localStorage.getItem("access_token");
 
-// Stock Movement
-export const addStockMovement = async (movementData) => api.post("/inventory/stock-movement/", movementData);
+// Axios instance with interceptor to attach token
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Attach token to every request
+apiClient.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// 🟢 Categories API Calls
+export const fetchCategories = async () => {
+  return await apiClient.get("/categories/");
+};
+
+export const createCategory = async (categoryData) => {
+  return await apiClient.post("/categories/", categoryData);
+};
+
+// 🟢 Products API Calls
+export const fetchProducts = async () => {
+  return await apiClient.get("/products/");
+};
+
+export const createProduct = async (productData) => {
+  return await apiClient.post("/products/", productData);
+};
+
+export const getProductDetails = async (id) => {
+  return await apiClient.get(`/products/${id}/`);
+};
+
+export const updateProduct = async (id, updateData) => {
+  return await apiClient.put(`/products/${id}/`, updateData);
+};
+
+export const deleteProduct = async (id) => {
+  return await apiClient.delete(`/products/${id}/`);
+};
+
+// 🟢 Stock Movement API Calls
+export const addStockMovement = async (movementData) => {
+  return await apiClient.post("/stock-movement/", movementData);
+};
+
+// 🟢 Low Stock Alerts API Calls
+export const getLowStockProducts = async () => {
+  return await apiClient.get("/products/low-stock/");
+};
 
 // Export all functions
 export default {
@@ -24,4 +72,5 @@ export default {
   updateProduct,
   deleteProduct,
   addStockMovement,
+  getLowStockProducts,
 };

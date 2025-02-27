@@ -1,25 +1,37 @@
-import { useEffect, useState } from "react";
-import { fetchProducts, addStockMovement } from "./InventoryAPI";
-import InventoryTable from "./InventoryTable";
-import InventoryForm from "./InventoryForm";
+// StockMovement.jsx
+import { useState } from 'react';
+import inventoryAPI from '../Services/api';
+import InventoryForm from './InventoryForm';
 
 const StockMovement = () => {
-  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchProducts().then((res) => setProducts(res.data));
-  }, []);
+  const addStockMovement = async (movementData) => {
+    setLoading(true);
+    setError('');
 
-  const handleStockUpdate = async (data) => {
-    await addStockMovement(data);
-    fetchProducts().then((res) => setProducts(res.data));
+    try {
+      await inventoryAPI.addStockMovement(movementData);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add stock movement. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold">Stock Movement</h2>
-      <InventoryForm onSubmit={handleStockUpdate} initialData={{ product_id: "", quantity: "", type: "add" }} />
-      <InventoryTable data={products} columns={[{ header: "Product Name", accessor: "name" }, { header: "Stock", accessor: "quantity_in_stock" }]} />
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Stock Movement</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <InventoryForm
+        onSubmit={addStockMovement}
+        fields={[
+          { name: 'product', label: 'Product ID', type: 'number' },
+          { name: 'movement_type', label: 'Movement Type' },
+          { name: 'quantity', label: 'Quantity', type: 'number' },
+        ]}
+      />
     </div>
   );
 };

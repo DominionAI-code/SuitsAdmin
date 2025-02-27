@@ -1,32 +1,39 @@
-import { useEffect, useState } from "react";
-import { fetchProducts } from "./InventoryAPI";
+// StockMovement.jsx
+import { useState } from 'react';
+import inventoryAPI from '../Services/api';
+import InventoryForm from './InventoryForm';
 
-const LowStockAlerts = () => {
-  const [lowStockProducts, setLowStockProducts] = useState([]);
+const StockMovement = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchProducts().then((res) => {
-      const filteredProducts = res.data.filter((product) => product.quantity_in_stock < 5); // Threshold for low stock
-      setLowStockProducts(filteredProducts);
-    });
-  }, []);
+  const addStockMovement = async (movementData) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      await inventoryAPI.addStockMovement(movementData);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add stock movement. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold">Low Stock Alerts</h2>
-      {lowStockProducts.length > 0 ? (
-        <ul>
-          {lowStockProducts.map((product) => (
-            <li key={product.id} className="text-red-500 font-semibold">
-              {product.name} - Only {product.quantity_in_stock} left!
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-green-500">All stock levels are good.</p>
-      )}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Stock Movement</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <InventoryForm
+        onSubmit={addStockMovement}
+        fields={[
+          { name: 'product', label: 'Product ID', type: 'number' },
+          { name: 'movement_type', label: 'Movement Type' },
+          { name: 'quantity', label: 'Quantity', type: 'number' },
+        ]}
+      />
     </div>
   );
 };
 
-export default LowStockAlerts;
+export default StockMovement;

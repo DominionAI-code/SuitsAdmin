@@ -12,11 +12,7 @@ import {
   BarChart3, 
   User 
 } from 'lucide-react';
-import Categories from "../Inventory/Categories";
-import Products from "../Inventory/Products";
-import LowStockAlert from "../Inventory/LowStockAlert"
-import StockMovement from "../inventory/StockMovement"; // Ensure correct path
-
+import Inventory from "../Inventory/Inventory";
 
 const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
@@ -148,11 +144,8 @@ const Dashboard = () => {
                 <Link to="/inventory" className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500 rounded-lg text-white font-bold text-sm transition-colors">
                   <div className="bg-indigo-500 p-2 rounded-md">
                     <Package className="h-5 w-5 text-white" />
+                    <Inventory />
                   </div>
-                 <Categories />
-                 <Products />
-                 <LowStockAlert />
-                 <StockMovement />
                 </Link>
               </li>
               <li>

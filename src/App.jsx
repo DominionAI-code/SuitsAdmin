@@ -10,6 +10,7 @@ import Products from "./Inventory/Products";
 import ProductDetails from "./Inventory/ProductDetails";
 import StockMovement from "./Inventory/StockMovement";
 import LowStockAlert from "./Inventory/LowStockAlert";
+import Inventory from "./Inventory/Inventory";
 
 const App = () => {
   return (
@@ -32,6 +33,8 @@ const App = () => {
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/stock-movement" element={<StockMovement />} />
           <Route path="/low-stock-alerts" element={<LowStockAlert />} />
+          <Route path="/inventory" element={<Inventory />} />
+
 
          
         </Routes>
