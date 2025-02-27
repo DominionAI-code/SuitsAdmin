@@ -12,12 +12,14 @@ const Register = () => {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track form submission state
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
+    setIsSubmitting(true); // Disable submit button during submission
 
     try {
       const response = await registerUser(formData);
@@ -25,10 +27,12 @@ const Register = () => {
       setSuccess(true);
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 2000); // Redirect to login after 2 seconds
     } catch (error) {
       console.error("Registration failed:", error.response?.data);
       setError(error.response?.data?.error || "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false); // Re-enable submit button
     }
   };
 
@@ -45,9 +49,10 @@ const Register = () => {
         <div className="bg-white py-8 px-10 shadow-2xl rounded-xl sm:px-12 border border-gray-100">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-800 text-center">Create Your Account</h2>
-            <p className="text-gray-500 mt-2 text-center">Join our platform to manage your business</p>
+            <p className="text-gray-500 mt-2 text-center">Register to the platform and be part of the team.</p>
           </div>
-          
+
+          {/* Success Message */}
           {success && (
             <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 text-green-700 rounded-lg flex items-center">
               <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -56,7 +61,8 @@ const Register = () => {
               <span className="text-base">Registration successful! Redirecting to login...</span>
             </div>
           )}
-          
+
+          {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-lg flex items-center">
               <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -65,8 +71,10 @@ const Register = () => {
               <span className="text-base">{error}</span>
             </div>
           )}
-          
+
+          {/* Registration Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Username Field */}
             <div>
               <label htmlFor="username" className="block text-base font-medium text-gray-700 mb-2">Username</label>
               <div className="relative rounded-md shadow-sm">
@@ -87,7 +95,8 @@ const Register = () => {
                 />
               </div>
             </div>
-            
+
+            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-2">Email address</label>
               <div className="relative rounded-md shadow-sm">
@@ -110,7 +119,8 @@ const Register = () => {
                 />
               </div>
             </div>
-            
+
+            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-base font-medium text-gray-700 mb-2">Password</label>
               <div className="relative rounded-md shadow-sm">
@@ -133,7 +143,8 @@ const Register = () => {
               </div>
               <p className="mt-1 text-sm text-gray-500">Password should be at least 8 characters</p>
             </div>
-            
+
+            {/* Role Field */}
             <div>
               <label htmlFor="role" className="block text-base font-medium text-gray-700 mb-2">Account Role</label>
               <div className="relative rounded-md shadow-sm">
@@ -157,21 +168,24 @@ const Register = () => {
               <p className="mt-1 text-sm text-gray-500">Select your role in the organization</p>
             </div>
 
+            {/* Submit Button */}
             <div className="pt-4">
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-lg font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-offset-2 transition duration-150 ease-in-out shadow-lg"
+                disabled={isSubmitting} // Disable button during submission
+                className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-lg font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-offset-2 transition duration-150 ease-in-out shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="absolute left-0 inset-y-0 flex items-center pl-4">
                   <svg className="h-5 w-5 text-indigo-300 group-hover:text-indigo-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
                 </span>
-                Create Account
+                {isSubmitting ? "Creating Account..." : "Create Account"}
               </button>
             </div>
           </form>
-          
+
+          {/* Login Link */}
           <div className="mt-8 border-t border-gray-200 pt-6">
             <p className="text-center text-base text-gray-600">
               Already have an account?{" "}
@@ -181,7 +195,8 @@ const Register = () => {
             </p>
           </div>
         </div>
-        
+
+        {/* Footer */}
         <div className="text-center mt-8 text-sm text-gray-500">
           <p>By creating an account, you agree to SuitsAdmins</p>
           <p className="mt-1">
