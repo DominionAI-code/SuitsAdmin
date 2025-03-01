@@ -166,6 +166,23 @@ export const downloadSalesReport = async () => {
   link.click();
 };
 
+export const createStockMovement = async (movementData) => {
+  const response = await fetch("/inventory/stock-movement/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(movementData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create stock movement");
+  }
+
+  return response.json();
+};
+
 
 
 export const getUsers = async () => {

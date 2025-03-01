@@ -11,9 +11,10 @@ import ProductDetails from "./Inventory/ProductDetails";
 import StockMovement from "./Inventory/StockMovement";
 import LowStockAlert from "./Inventory/LowStockAlert";
 import Inventory from "./Inventory/Inventory";
-import Orders from './Orders/Orders';
+import OrderManager from './Orders/OrderManager';
 import OrderDetails from './Orders/OrderDetails';
 import SalesReport from './Orders/SalesReport';
+
 
 const App = () => {
   return (
@@ -37,7 +38,7 @@ const App = () => {
           <Route path="/stock-movement" element={<StockMovement />} />
           <Route path="/low-stock-alerts" element={<LowStockAlert />} />
           <Route path="/inventory" element={<Inventory />} />
-          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders" element={<OrderManager />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/products" element={<Products />} />
           <Route path="/sales-reports" element={<SalesReport />} />
