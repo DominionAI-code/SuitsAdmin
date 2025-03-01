@@ -40,7 +40,7 @@ const Dashboard = () => {
         }
   
         // Fetch user details
-        const response = await api.get("/users/", {
+        const response = await api.get("/users/users/", {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -144,8 +144,8 @@ const Dashboard = () => {
                 <Link to="/inventory" className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500 rounded-lg text-white font-bold text-sm transition-colors">
                   <div className="bg-indigo-500 p-2 rounded-md">
                     <Package className="h-5 w-5 text-white" />
-                    <Inventory />
                   </div>
+                  Inventory
                 </Link>
               </li>
               <li>

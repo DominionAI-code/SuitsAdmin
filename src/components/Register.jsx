@@ -9,6 +9,7 @@ const Register = () => {
     password: "",
     role: "admin",
   });
+  
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -16,25 +17,31 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(false);
-    setIsSubmitting(true); // Disable submit button during submission
+  e.preventDefault();
+  setError(null);
+  setSuccess(false);
+  setIsSubmitting(true);
 
-    try {
-      const response = await registerUser(formData);
-      console.log("Registration successful:", response.data);
+  try {
+    const responseData = await registerUser(formData);
+
+    console.log("Registration response data:", responseData); // Debug responseData
+
+    if (responseData) {
       setSuccess(true);
       setTimeout(() => {
         navigate("/login");
-      }, 2000); // Redirect to login after 2 seconds
-    } catch (error) {
-      console.error("Registration failed:", error.response?.data);
-      setError(error.response?.data?.error || "Registration failed. Please try again.");
-    } finally {
-      setIsSubmitting(false); // Re-enable submit button
+      }, 2000);
+    } else {
+      setError("Unexpected error: No response data received.");
     }
-  };
+  } catch (error) {
+    console.error("Registration failed:", error.response?.data);
+    setError(error.response?.data?.error || "Registration failed. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">

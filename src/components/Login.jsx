@@ -16,6 +16,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form Data before submission:", formData); // Log form data
     setIsLoading(true);
     setError("");
 

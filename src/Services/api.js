@@ -6,36 +6,66 @@ const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  // Set a reasonable timeout to avoid hanging requests
+  timeout: 10000
 });
 
+// Remove duplicate token adding since we have interceptors
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('access_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, error => {
+  return Promise.reject(error);
 });
 
 api.interceptors.response.use(
   response => response,
   async error => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+    
+    // Prevent infinite refresh loops
+    if (originalRequest._retry) {
+      localStorage.clear();
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       const refresh = localStorage.getItem('refresh_token');
+      
       if (refresh) {
         try {
           const response = await axios.post(`${BASE_URL}/users/token/refresh/`, {
             refresh
           });
+          
+          // Update stored token
           localStorage.setItem('access_token', response.data.access);
-          error.config.headers.Authorization = `Bearer ${response.data.access}`;
-          return axios(error.config);
-        } catch {
+          
+          // Update auth header
+          originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
+          
+          // Retry the original request
+          return axios(originalRequest);
+        } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError);
           localStorage.clear();
-          window.location.href = '/login';
+          window.location.href = '/login?expired=true';
+          return Promise.reject(error);
         }
+      } else {
+        localStorage.clear();
+        window.location.href = '/login';
+        return Promise.reject(error);
       }
     }
+    
+    // Handle other errors normally
     return Promise.reject(error);
   }
 );
@@ -46,21 +76,130 @@ export const registerUser = async (userData) => {
   return response.data;
 };
 
+export const getCategories = async () => {
+  const response = await api.get('/inventory/categories/');
+  return response.data;
+};
+
+export const createCategory = async (categoryData) => {
+  const response = await api.post('/inventory/categories/', categoryData);
+  return response.data;
+};
+
+// Product API functions
+export const getProducts = async () => {
+  const response = await api.get('/inventory/products/');
+  return response.data;
+};
+
+export const createProduct = async (productData) => {
+  const response = await api.post('/inventory/products/', productData);
+  return response.data;
+};
+
+export const updateProduct = async (id, updatedData) => {
+  const response = await api.put(`/inventory/products/${id}/`, updatedData);
+  return response.data;
+};
+
+export const deleteProduct = async (id) => {
+  const response = await api.delete(`/inventory/products/${id}/`);
+  return response.data;
+};
+
+// Order API functions
+export const getOrders = async () => {
+  const response = await api.get('/orders/orders/');
+  return response.data;
+};
+
+export const getOrderById = async (id) => {
+  const response = await api.get(`/orders/orders/${id}/`);
+  return response.data;
+};
+
+export const createOrder = async (orderData) => {
+  const response = await api.post('/orders/orders/', orderData);
+  return response.data;
+};
+
+export const updateOrder = async (id, updatedData) => {
+  const response = await api.patch(`/orders/orders/${id}/`, updatedData);
+  return response.data;
+};
+
+export const deleteOrder = async (id) => {
+  const response = await api.delete(`/orders/orders/${id}/`);
+  return response.data;
+};
+
+export const generateInvoice = async (id) => {
+  const response = await api.get(`/orders/orders/${id}/invoice/`);
+  return response.data;
+};
+
+export const updateOrderStatus = async (id, updatedData) => {
+  const response = await api.patch(`/orders/orders/${id}/`, updatedData);
+  return response.data;
+};
+
+
+// Sales API functions
+// Sales API functions
+export const getSalesReports = async () => {
+  const response = await api.get('/orders/sales-reports/');
+  return response.data;
+};
+
+export const generateSalesReport = async () => {
+  const response = await api.get('/orders/sales-reports/generate/');
+  return response.data;
+};
+
+export const downloadSalesReport = async () => {
+  const response = await api.get('/orders/sales-reports/download/', { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'sales_report.pdf');
+  document.body.appendChild(link);
+  link.click();
+};
+
+
+
 export const getUsers = async () => {
-  const response = await api.get("/users");
+  const response = await api.get("/users//users");
   return response.data;
 };
 
 export const authAPI = {
   async login(credentials) {
-    const response = await api.post('/users/login/', credentials);
-    localStorage.setItem('access_token', response.data.access);
-    localStorage.setItem('refresh_token', response.data.refresh);
-    return response.data;
+    try {
+      const response = await api.post('/users/token/', credentials);
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw {
+          status: error.response.status,
+          message: error.response.data?.detail || 'Login failed. Please check your credentials.'
+        };
+      } else {
+        throw {
+          status: 0,
+          message: 'Network error. Please check your connection.'
+        };
+      }
+    }
   },
   logout() {
     localStorage.clear();
     window.location.href = '/login';
+  },
+  isAuthenticated() {
+    return !!localStorage.getItem('access_token');
   }
 };
 

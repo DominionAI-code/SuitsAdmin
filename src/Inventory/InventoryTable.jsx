@@ -1,37 +1,62 @@
-const InventoryTable = ({ data = [], columns = [] }) => {
-    // Handle empty data or columns
-    if (data.length === 0 || columns.length === 0) {
-      return (
-        <div className="text-center text-gray-500 py-4">
-          No data available
-        </div>
-      );
-    }
-  
-    return (
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            {columns.map((col, index) => (
-              <th key={col.accessor || index} className="border p-2">
-                {col.header}
+const InventoryTable = ({ data, columns, onEdit, onDelete }) => {
+  return (
+    <div className="overflow-x-auto border rounded shadow-sm">
+      <table className="min-w-full bg-white">
+        <thead className="bg-gray-50">
+          <tr>
+            {columns.map((column) => (
+              <th 
+                key={column.key} 
+                className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b"
+              >
+                {column.label}
               </th>
             ))}
+            {(onEdit || onDelete) && <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Actions</th>}
           </tr>
         </thead>
-        <tbody>
-          {data.map((row, rowIndex) => (
-            <tr key={row.id || rowIndex} className="border">
-              {columns.map((col, colIndex) => (
-                <td key={col.accessor || colIndex} className="p-2 border">
-                  {row[col.accessor]}
-                </td>
-              ))}
+        <tbody className="divide-y divide-gray-200">
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={columns.length + (onEdit || onDelete ? 1 : 0)} className="px-4 py-4 text-center text-gray-500">
+                No items found
+              </td>
             </tr>
-          ))}
+          ) : (
+            data.map((item, index) => (
+              <tr key={item.id || index} className="hover:bg-gray-50">
+                {columns.map((column) => (
+                  <td key={column.key} className="px-4 py-2 whitespace-nowrap">
+                    {item[column.key]}
+                  </td>
+                ))}
+                {(onEdit || onDelete) && (
+                  <td className="px-4 py-2 whitespace-nowrap space-x-2">
+                    {onEdit && (
+                      <button 
+                        onClick={() => onEdit(item)} 
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button 
+                        onClick={() => onDelete(item.id || index)} 
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
-    );
-  };
-  
-  export default InventoryTable;
+    </div>
+  );
+};
+
+export default InventoryTable;

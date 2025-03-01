@@ -1,91 +1,84 @@
-// Products.jsx
-import { useState, useEffect } from 'react';
-import inventoryAPI  from '../Services/api';
-import InventoryTable from './InventoryTable';
-import InventoryForm from './InventoryForm';
+// ProductInventory.js
+import { useState, useEffect } from "react";
+import { getProducts, createProduct, deleteProduct } from "../Services/api";
+import ProductDetails from "./ProductDetails";
 
-const Products = () => {
+const ProductInventory = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const fetchProducts = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const data = await inventoryAPI.getProducts();
-      setProducts(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch products. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addProduct = async (productData) => {
-    setLoading(true);
-    setError('');
-
-    try {
-      await inventoryAPI.createProduct(productData);
-      fetchProducts(); // Refresh the list after adding a product
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create product. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteProduct = async (product) => {
-    setLoading(true);
-    setError('');
-
-    try {
-      await inventoryAPI.deleteProduct(product.id);
-      fetchProducts(); // Refresh the list after deleting a product
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete product. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(id);
+        fetchProducts();
+      } catch (error) {
+        console.error("Error deleting product:", error);
+      }
+    }
+  };
+
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Products</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <InventoryForm
-        onSubmit={addProduct}
-        fields={[
-          { name: 'name', label: 'Name' },
-          { name: 'description', label: 'Description' },
-          { name: 'sku', label: 'SKU' },
-          { name: 'price', label: 'Price', type: 'number' },
-          { name: 'quantity_in_stock', label: 'Quantity in Stock', type: 'number' },
-        ]}
-      />
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <InventoryTable
-          data={products}
-          columns={[
-            { key: 'name', label: 'Name' },
-            { key: 'description', label: 'Description' },
-            { key: 'sku', label: 'SKU' },
-            { key: 'price', label: 'Price' },
-            { key: 'quantity_in_stock', label: 'Quantity in Stock' },
-          ]}
-          onDelete={deleteProduct}
-        />
-      )}
+    <div className="bg-gray-100 min-h-screen">
+      <div className="max-w-6xl mx-auto p-6">
+        <header className="mb-8">
+          <h2 className="text-3xl font-bold text-indigo-800">Product Inventory</h2>
+          <p className="text-gray-600">Manage and organize your products</p>
+        </header>
+
+        <ProductDetails onProductAdded={fetchProducts} />
+
+        <div className="mt-8">
+          <h3 className="text-lg font-medium mb-4">Product List</h3>
+          {loading ? (
+            <p>Loading products...</p>
+          ) : (
+            <ul>
+              {filteredProducts.map((product) => (
+                <li key={product.id} className="p-4 bg-white shadow-md mb-4 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-xl font-bold">{product.name}</h4>
+                      <p>{product.description}</p>
+                      <span className="text-sm text-gray-500">SKU: {product.sku}</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <button onClick={() => handleDelete(product.id)} className="text-red-500">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Products;
+export default ProductInventory;

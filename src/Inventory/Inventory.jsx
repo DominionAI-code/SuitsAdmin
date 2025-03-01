@@ -7,6 +7,7 @@ const Inventory = () => {
       <h1 className="text-2xl font-bold mb-4">Inventory Management</h1>
       <Categories />
       <Products />
+      
     </div>
   );
 };
