@@ -1,21 +1,59 @@
+// // src/components/TableManagement/TableList.jsx
+// import { useEffect, useState } from 'react';
+// import { fetchTables } from './TableAPI';
+
+// const TableList = ({ token }) => {
+//     const [tables, setTables] = useState([]);
+    
+//     useEffect(() => {
+//         const getTables = async () => {
+//             const data = await fetchTables(token);
+//             setTables(data);
+//         };
+//         getTables();
+//     }, [token]);
+    
+//     return (
+//         <div>
+//             <h2>Table List</h2>
+//             <ul>
+//                 {tables.map(table => (
+//                     <li key={table.id}>Table {table.table_number} - Status: {table.status}</li>
+//                 ))}
+//             </ul>
+//         </div>
+//     );
+// };
+
+// export default TableList;
+
+
+
 // src/components/TableManagement/TableList.jsx
 import { useEffect, useState } from 'react';
 import { fetchTables } from './TableAPI';
 
-const TableList = ({ token }) => {
+const TableList = () => {
     const [tables, setTables] = useState([]);
-    
+    const [error, setError] = useState(null);
+
     useEffect(() => {
         const getTables = async () => {
-            const data = await fetchTables(token);
-            setTables(data);
+            try {
+                const data = await fetchTables();
+                setTables(data);
+            } catch (error) {
+                setError("Failed to fetch tables. Please try again.");
+                console.error("Error fetching tables:", error);
+            }
         };
         getTables();
-    }, [token]);
-    
+    }, []);
+
     return (
         <div>
             <h2>Table List</h2>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             <ul>
                 {tables.map(table => (
                     <li key={table.id}>Table {table.table_number} - Status: {table.status}</li>
