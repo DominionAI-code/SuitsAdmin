@@ -1,30 +1,31 @@
-import { updateOrderStatus } from "../Services/orderApi";
-
-const OrderDetails = ({ order, onBack }) => {
-  const handleCompleteOrder = async () => {
-    await updateOrderStatus(order.id, "completed");
-    alert("Order marked as completed!");
-    onBack();
-  };
+const OrderDetails = ({ order }) => {
+  // Calculate the total price by summing up the price of each item multiplied by its quantity
+  const totalPrice = order.items.reduce((total, item) => total + item.quantity * item.price_at_purchase, 0);
 
   return (
-    <div>
-      <h3 className="text-lg font-medium mb-4">Order Details</h3>
-      <p>Customer: {order.customer_name}</p>
-      <p>Total Amount: ${order.total_amount}</p>
-      <p>Status: {order.status}</p>
-      <button
-        onClick={handleCompleteOrder}
-        className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg"
-      >
-        Mark as Completed
-      </button>
-      <button
-        onClick={onBack}
-        className="mt-4 ml-2 bg-gray-500 text-white px-4 py-2 rounded-lg"
-      >
-        Back
-      </button>
+    <div className="p-4 border rounded-lg shadow bg-white">
+      <h2 className="text-2xl font-bold mb-4">Order #{order.id} Details</h2>
+      
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold">Customer Information</h3>
+        <p className="text-gray-700">Name: <span className="font-medium">{order.customer_name}</span></p>
+      </div>
+      
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold">Order Items</h3>
+        <ul className="list-disc list-inside">
+          {order.items.map((item) => (
+            <li key={item.id} className="text-gray-700">
+              <span className="font-medium">{item.product_name}</span> — {item.quantity} x ${item.price_at_purchase.toFixed(2)}
+            </li>
+          ))}
+        </ul>
+      </div>
+      
+      <div className="border-t pt-4">
+        <h3 className="text-xl font-bold">Total Amount: ${totalPrice.toFixed(2)}</h3>
+        <p className="text-gray-600 mt-2">Thank you for your purchase!</p>
+      </div>
     </div>
   );
 };

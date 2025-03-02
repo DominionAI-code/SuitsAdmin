@@ -8,7 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json'
   },
   // Set a reasonable timeout to avoid hanging requests
-  timeout: 10000
+  timeout: 30000
 });
 
 // Remove duplicate token adding since we have interceptors
@@ -108,6 +108,18 @@ export const deleteProduct = async (id) => {
 };
 
 // Order API functions
+
+export const createOrder = async (orderData) => {
+  try {
+    const response = await api.post('/orders/orders/', orderData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw error;
+  }
+};
+
+
 export const getOrders = async () => {
   const response = await api.get('/orders/orders/');
   return response.data;
@@ -118,28 +130,13 @@ export const getOrderById = async (id) => {
   return response.data;
 };
 
-export const createOrder = async (orderData) => {
-  const response = await api.post('/orders/orders/', orderData);
-  return response.data;
-};
-
-export const updateOrder = async (id, updatedData) => {
-  const response = await api.patch(`/orders/orders/${id}/`, updatedData);
-  return response.data;
-};
-
-export const deleteOrder = async (id) => {
-  const response = await api.delete(`/orders/orders/${id}/`);
+export const updateOrderStatus = async (id, status) => {
+  const response = await api.patch(`/orders/orders/${id}/`, { status });
   return response.data;
 };
 
 export const generateInvoice = async (id) => {
-  const response = await api.get(`/orders/orders/${id}/invoice/`);
-  return response.data;
-};
-
-export const updateOrderStatus = async (id, updatedData) => {
-  const response = await api.patch(`/orders/orders/${id}/`, updatedData);
+  const response = await api.post(`/orders/${id}/generate-invoice/`);
   return response.data;
 };
 

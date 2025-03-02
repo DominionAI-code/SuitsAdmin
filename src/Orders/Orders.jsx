@@ -5,17 +5,21 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [newOrder, setNewOrder] = useState({ customer_name: '', items: [] });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchOrders();
   }, []);
 
   const fetchOrders = async () => {
+    setLoading(true);
     try {
       const data = await getOrders();
       setOrders(data);
     } catch (error) {
       setError("Error fetching orders: " + (error.response?.data || error.message));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -24,14 +28,16 @@ const Orders = () => {
       setError("Customer name and at least one item are required.");
       return;
     }
-
+    setLoading(true);
     try {
       await createOrder(newOrder);
-      setNewOrder({ customer_name: '', items: [] }); // Reset form
+      setNewOrder({ customer_name: '', items: [] });
       setError('');
       fetchOrders(); // Refresh orders list
     } catch (error) {
       setError("Error creating order: " + (error.response?.data || error.message));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,35 +83,43 @@ const Orders = () => {
               type="number"
               placeholder="Quantity"
               value={item.quantity}
+              min="1"
               onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
               className="border p-2 w-1/2 rounded"
             />
           </div>
         ))}
-        <button 
-          onClick={handleAddItem} 
+        <button
+          onClick={handleAddItem}
           className="bg-yellow-500 text-white px-4 py-2 rounded mr-4 hover:bg-yellow-600"
         >
           Add Item
         </button>
-        <button 
-          onClick={handleCreateOrder} 
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        <button
+          onClick={handleCreateOrder}
+          disabled={loading}
+          className={`px-4 py-2 rounded ${loading ? 'bg-gray-400' : 'bg-green-500 hover:bg-green-600'} text-white`}
         >
-          Create Order
+          {loading ? 'Creating Order...' : 'Create Order'}
         </button>
       </div>
 
       <h2 className="text-2xl mb-4">Order List</h2>
-      <ul className="space-y-4">
-        {orders.map((order) => (
-          <li key={order.id} className="p-4 bg-white shadow rounded-lg">
-            <p className="text-lg font-semibold">{order.customer_name}</p>
-            <p>Status: {order.status}</p>
-            <p>Total Amount: ${order.total_amount}</p>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : orders.length === 0 ? (
+        <p className="text-gray-500">No orders found.</p>
+      ) : (
+        <ul className="space-y-4">
+          {orders.map((order) => (
+            <li key={order.id} className="p-4 bg-white shadow rounded-lg">
+              <p className="text-lg font-semibold">{order.customer_name}</p>
+              <p>Status: {order.status}</p>
+              <p>Total Amount: ${order.total_amount}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

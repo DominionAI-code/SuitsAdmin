@@ -1,7 +1,7 @@
-import { getSalesReports } from "../Services/orderApi";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from 'react';
+import { getSalesReports } from '../Services/orderApi';
 
-const SalesReport = ({ onBack }) => {
+const SalesReport = () => {
   const [reports, setReports] = useState([]);
 
   useEffect(() => {
@@ -9,25 +9,26 @@ const SalesReport = ({ onBack }) => {
   }, []);
 
   const fetchReports = async () => {
-    const data = await getSalesReports();
-    setReports(data);
+    try {
+      const data = await getSalesReports();
+      setReports(data);
+    } catch (error) {
+      console.error('Failed to fetch sales reports:', error);
+    }
   };
 
   return (
     <div>
-      <h3 className="text-lg font-medium mb-4">Sales Reports</h3>
+      <h1>Sales Reports</h1>
       <ul>
-        {reports.map((report) => (
-          <li key={report.id}>
-            {report.month}: ${report.total_revenue}
-          </li>
+        {reports.map((report, index) => (
+          <li key={index}>{report.date}: ${report.total_sales}</li>
         ))}
       </ul>
-      <button onClick={onBack} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded-lg">
-        Back
-      </button>
     </div>
   );
 };
 
 export default SalesReport;
+
+

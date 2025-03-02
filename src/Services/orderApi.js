@@ -23,19 +23,11 @@ export const createOrder = async (orderData) => {
 // Fetch all orders
 export const getOrders = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`, // Handle token
-      },
-    });
-
+    const response = await fetch(`${BASE_URL}/orders`);
+    console.log("BASE URL:", `${BASE_URL}/orders`);
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API Error Response:", errorText);
       throw new Error(`API request failed with status ${response.status}`);
     }
-
     return await response.json();
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -43,9 +35,10 @@ export const getOrders = async () => {
   }
 };
 
+
 // Fetch a single order by ID
 export const getOrderById = async (id) => {
-  const response = await fetch(`${BASE_URL}/${id}/`, {
+  const response = await fetch(`${BASE_URL}/${id}/orders`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -63,7 +56,7 @@ export const getOrderById = async (id) => {
 
 // Update order status (e.g., mark as completed)
 export const updateOrderStatus = async (id, status) => {
-  const response = await fetch(`${BASE_URL}/${id}/`, {
+  const response = await fetch(`${BASE_URL}/${id}/orders`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
