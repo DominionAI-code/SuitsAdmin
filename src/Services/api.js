@@ -135,9 +135,17 @@ export const updateOrderStatus = async (id, status) => {
   return response.data;
 };
 
-export const generateInvoice = async (id) => {
-  const response = await api.post(`/orders/${id}/generate-invoice/`);
-  return response.data;
+
+export const generateInvoice = async (orderId) => {
+  try {
+    const response = await api.get(`/transactions/orders/${orderId}/invoice/`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to generate invoice:', error);
+    throw error;
+  }
 };
 
 

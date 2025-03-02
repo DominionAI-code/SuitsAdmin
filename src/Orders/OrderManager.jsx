@@ -71,7 +71,7 @@ const OrderManager = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Order Management</h2>
+      <h2 className="text-2xl font-bold mb-4">Sales Processing</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded-lg shadow-md">
