@@ -14,7 +14,7 @@ import Inventory from "./Inventory/Inventory";
 import OrderManager from './Orders/OrderManager';
 import OrderDetails from './Orders/OrderDetails';
 import SalesReport from './Orders/SalesReport';
-
+import Table from "./Table/Table";
 
 const App = () => {
   return (
@@ -42,9 +42,7 @@ const App = () => {
           <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/products" element={<Products />} />
           <Route path="/sales-reports" element={<SalesReport />} />
-
-
-         
+          <Route path="/table" element={<Table />} />
         </Routes>
       </AuthProvider>
     </Router>
