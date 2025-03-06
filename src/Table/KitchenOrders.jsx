@@ -59,7 +59,7 @@ const KitchenOrders = () => {
     return (
         <div className="bg-indigo-800 text-white p-6 rounded-lg shadow-md max-w-md mx-auto w-[75%]">
             <h2 className="text-lg font-semibold mb-4">Kitchen Orders</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ }}>{error}</p>}
             <ul className="space-y-2">
                 {orders.map(order => (
                     <li 

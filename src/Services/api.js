@@ -148,6 +148,10 @@ export const generateInvoice = async (orderId) => {
   }
 };
 
+// Table API functions
+// export const fetchTables = () => fetchData("/table/tables/");
+// export const createTable = (tableData) => fetchData("/table/tables/", "POST", tableData);
+
 
 // Sales API functions
 // Sales API functions

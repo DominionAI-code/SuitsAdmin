@@ -94,7 +94,7 @@ const BillSplitForm = ({ orderId, onBillSplit }) => {
         >
             <h2 className="text-lg font-semibold mb-4">Split Bill</h2>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ }}>{error}</p>}
             
             <label className="block mb-2">Customer Name:</label>
             <input 

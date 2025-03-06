@@ -56,7 +56,7 @@ const BarOrders = () => {
     return (
         <div className="bg-indigo-500 text-white p-4 rounded-lg w-[80%] mx-auto">
             <h2 className="text-lg font-semibold mb-2">Bar Orders</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{  }}>{error}</p>}
             <ul>
                 {orders.map(order => (
                     <li 
